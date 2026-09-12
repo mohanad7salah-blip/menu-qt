@@ -1,0 +1,563 @@
+# menu-qt<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منيو لومير الرقمي | Lumière Menu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- الألوان المستوحاة من الفيديو (عنابي فاخر + أسود + ذهبي) --- */
+        :root {
+            --bg-main: #140E0C;             /* خلفية سوداء دافئة */
+            --bg-card: #201512;             /* لون الكروت داكن عنابي */
+            --brand-red: #58181F;           /* عنابي فاخر للأزرار */
+            --brand-red-active: #7A222B;    /* عنابي أفتح للنشط */
+            --text-gold: #D4A373;           /* ذهبي مطفأ للأرقام والعناوين */
+            --text-white: #FFFFFF;
+            --text-muted: #B3A59E;
+            --border-color: rgba(212, 163, 115, 0.2);
+            --radius-card: 16px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-white);
+            max-width: 500px; /* لضمان مظهر التطبيق حتى على شاشات الحاسوب */
+            margin: 0 auto;
+            min-height: 100vh;
+            padding-bottom: 3rem;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        }
+
+        /* --- شاشة التحميل الفاخرة --- */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-main);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .loader-logo-box {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--brand-red), #360E13);
+            border: 2px solid var(--text-gold);
+            border-radius: 22px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: pulse 1.5s infinite ease-in-out;
+            margin-bottom: 1.5rem;
+        }
+
+        .loader-logo-box span {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            color: var(--text-gold);
+            font-weight: bold;
+        }
+
+        .spinner {
+            width: 35px;
+            height: 35px;
+            border: 3px solid rgba(212, 163, 115, 0.2);
+            border-top: 3px solid var(--text-gold);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+        /* --- الهيدر واللوجو --- */
+        header {
+            padding: 1.2rem 1rem 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: rgba(20, 14, 12, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .brand-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .header-logo {
+            width: 45px;
+            height: 45px;
+            background: var(--brand-red);
+            border: 1px solid var(--text-gold);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Playfair Display', serif;
+            color: var(--text-gold);
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .header-title h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .header-title p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* --- الأقسام الرئيسية (الأزرار العلوية الأربعة) --- */
+        .main-categories {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.6rem;
+            padding: 1rem;
+        }
+
+        .main-cat-btn {
+            background: var(--brand-red);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 0.8rem 0.2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--text-white);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .main-cat-btn.active {
+            background: linear-gradient(135deg, #7A222B 0%, #421217 100%);
+            border-color: var(--text-gold);
+            box-shadow: 0 4px 15px rgba(122, 34, 43, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .main-cat-btn img {
+            width: 28px;
+            height: 28px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .main-cat-btn span {
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        /* --- الأقسام الفرعية (السلايدر الأفقي) --- */
+        .sub-categories {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0 1rem 1rem;
+            overflow-x: auto;
+            scrollbar-width: none; /* إخفاء السكرول بار */
+        }
+
+        .sub-categories::-webkit-scrollbar { display: none; }
+
+        .sub-cat-btn {
+            background: rgba(88, 24, 31, 0.3);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 0.5rem 1.2rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .sub-cat-btn.active {
+            background: var(--brand-red);
+            color: var(--text-white);
+            border-color: var(--text-gold);
+            font-weight: 700;
+        }
+
+        /* --- عنوان القسم الحقيقي --- */
+        .category-header-title {
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-white);
+            margin: 0.5rem 0 1.2rem;
+            position: relative;
+        }
+
+        .category-header-title::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 2px;
+            background: var(--text-gold);
+            margin: 0.4rem auto 0;
+            border-radius: 2px;
+        }
+
+        .sub-section-label {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-gold);
+            padding: 0 1.2rem 0.8rem;
+        }
+
+        /* --- كروت الوجبات والأطباق --- */
+        .menu-list {
+            padding: 0 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .menu-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-card);
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            transition: var(--transition);
+        }
+
+        .menu-card:active {
+            transform: scale(0.98);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-white);
+            margin-bottom: 0.4rem;
+        }
+
+        .card-desc {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 0.8rem;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px dashed rgba(212, 163, 115, 0.15);
+            padding-top: 0.8rem;
+            margin-top: 0.4rem;
+        }
+
+        .card-price {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--text-gold);
+        }
+
+        .btn-order {
+            background: var(--brand-red);
+            border: 1px solid var(--text-gold);
+            color: var(--text-white);
+            padding: 0.4rem 0.9rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loading-screen">
+        <div class="loader-logo-box">
+            <span>QT</span>
+        </div>
+        <div class="spinner"></div>
+    </div>
+
+    <header>
+        <div class="brand-header">
+            <div class="header-logo">QT</div>
+            <div class="header-title">
+                <h1>مطعم ولونج كيو تي</h1>
+                <p>القائمة الرقمية التفاعلية</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-categories">
+        <button class="main-cat-btn active" onclick="switchMainCat('food')">
+            <span style="font-size: 1.3rem;">🍽️</span>
+            <span>الطعام</span>
+        </button>
+        <button class="main-cat-btn" onclick="switchMainCat('drinks')">
+            <span style="font-size: 1.3rem;">🥤</span>
+            <span>المشروبات</span>
+        </button>
+        <button class="main-cat-btn" onclick="switchMainCat('sweets')">
+            <span style="font-size: 1.3rem;">🍰</span>
+            <span>الحلويات</span>
+        </button>
+        <button class="main-cat-btn" onclick="switchMainCat('shisha')">
+            <span style="font-size: 1.3rem;">💨</span>
+            <span>الأراكيل</span>
+        </button>
+    </div>
+
+    <div class="sub-categories" id="subCategories">
+        </div>
+
+    <div class="category-header-title" id="catTitle">الطعام</div>
+
+    <div id="menuContent">
+        </div>
+
+    <script>
+        // إخفاء شاشة التحميل
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const loader = document.getElementById('loading-screen');
+                loader.style.opacity = '0';
+                loader.style.visibility = 'hidden';
+            }, 600);
+        });
+
+        // قاعدة البيانات مثل الفيديو تماماً
+        const menuData = {
+            food: {
+                title: "الطعام",
+                subs: ["فطور صباحي", "شوربة", "سلطات", "مقبلات باردة"],
+                items: [
+                    {
+                        sub: "فطور صباحي",
+                        name: "فطور لشخص واحد",
+                        price: "15,000 د.ع",
+                        desc: "طبق فطور متكامل يضم بيض طازج، تشكيلة أجبان، خضار، زيتون، مقبلات متنوعة، خبز طازج مع شوربة خفيفة وشاي تركي.",
+                        img: "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=600&auto=format&fit=crop&q=80"
+                    },
+                    {
+                        sub: "فطور صباحي",
+                        name: "فطور صباحي لشخصين",
+                        price: "25,000 د.ع",
+                        desc: "منيو فطور متنوع يشتمل على تشكيلة مقبلات وأطباق خفيفة، زيتون وجبن وخضار، مربى وعسل، بطاطس مقلية، وشاي مميز للمشاركة.",
+                        img: "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=600&auto=format&fit=crop&q=80"
+                    },
+                    {
+                        sub: "شوربة",
+                        name: "شوربة عدس",
+                        price: "3,500 د.ع",
+                        desc: "شوربة عدس غنية ومطبوخة على الطريقة التقليدية تقدم مع الليمون والخبز المحمص.",
+                        img: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&auto=format&fit=crop&q=80"
+                    },
+                    {
+                        sub: "سلطات",
+                        name: "سلطة كينوا",
+                        price: "13,000 د.ع",
+                        desc: "كينوا طازجة مع الخضار المشكلة، حبات الرمان وصوص الليمون الخاص.",
+                        img: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&auto=format&fit=crop&q=80"
+                    }
+                ]
+            },
+            drinks: {
+                title: "المشروبات",
+                subs: ["مشروبات غازية", "شاي ورر كافيه", "قهوة تركية"],
+                items: [
+                    {
+                        sub: "مشروبات غازية",
+                        name: "مياه صغيرة",
+                        price: "1,500 د.ع",
+                        desc: "مياه معدنية نقية وباردة.",
+                        img: "https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=600&auto=format&fit=crop&q=80"
+                    },
+                    {
+                        sub: "مشروبات غازية",
+                        name: "سفن أب / بيبسي / ميراندا",
+                        price: "2,000 د.ع",
+                        desc: "مشروب غازي بارد حسب اختيارك.",
+                        img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=600&auto=format&fit=crop&q=80"
+                    },
+                    {
+                        sub: "مشروبات غازية",
+                        name: "ريدبول مكسيكي",
+                        price: "7,000 د.ع",
+                        desc: "مشروب طاقة مميز مع خلطة النكهات المكسيكية والثلج.",
+                        img: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=600&auto=format&fit=crop&q=80"
+                    }
+                ]
+            },
+            sweets: {
+                title: "الحلويات",
+                subs: ["حلويات وفواكه", "كيك خاص"],
+                items: [
+                    {
+                        sub: "حلويات وفواكه",
+                        name: "بوشيه فاخر",
+                        price: "13,000 د.ع",
+                        desc: "طبق حلوى مميز محشو بالكريمة ومزين بصلصة التوت الأحمر الطازج.",
+                        img: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=80"
+                    }
+                ]
+            },
+            shisha: {
+                title: "الأراكيل",
+                subs: ["بابلية", "كلاسيك", "شامبانيا أبيض", "بانادا"],
+                items: [
+                    {
+                        sub: "بابلية",
+                        name: "اركيلة بابلي",
+                        price: "15,000 د.ع",
+                        desc: "نرجيلة بابلية فاخرة مع أفضل أنواع المعسل حسب طلبك.",
+                        img: "https://images.unsplash.com/photo-1527016021513-b09758b777bd?w=600&auto=format&fit=crop&q=80"
+                    },
+                    {
+                        sub: "كلاسيك",
+                        name: "اركيلة كلاسيك",
+                        price: "17,000 د.ع",
+                        desc: "أركيلة كلاسيكية ممتازة بنكهات متناغمة وهادئة.",
+                        img: "https://images.unsplash.com/photo-1510076803875-188812613170?w=600&auto=format&fit=crop&q=80"
+                    }
+                ]
+            }
+        };
+
+        let currentMainCat = 'food';
+        let currentSubFilter = 'all';
+
+        function switchMainCat(catKey) {
+            currentMainCat = catKey;
+            currentSubFilter = 'all';
+
+            // تحديث زر الفئة الرئيسية
+            document.querySelectorAll('.main-cat-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            // تحديث عنوان القسم
+            document.getElementById('catTitle').innerText = menuData[catKey].title;
+
+            renderSubCategories();
+            renderMenuItems();
+        }
+
+        function renderSubCategories() {
+            const subContainer = document.getElementById('subCategories');
+            subContainer.innerHTML = '';
+
+            const subs = menuData[currentMainCat].subs;
+            subs.forEach((sub, index) => {
+                const btn = document.createElement('button');
+                btn.className = `sub-cat-btn ${index === 0 ? 'active' : ''}`;
+                btn.innerText = sub;
+                btn.onclick = (e) => {
+                    document.querySelectorAll('.sub-cat-btn').forEach(b => b.classList.remove('active'));
+                    e.currentTarget.classList.add('active');
+                    filterBySub(sub);
+                };
+                subContainer.appendChild(btn);
+            });
+        }
+
+        function filterBySub(subName) {
+            currentSubFilter = subName;
+            renderMenuItems();
+        }
+
+        function renderMenuItems() {
+            const container = document.getElementById('menuContent');
+            container.innerHTML = '';
+
+            const catData = menuData[currentMainCat];
+            let itemsToDisplay = catData.items;
+
+            if (currentSubFilter !== 'all') {
+                itemsToDisplay = catData.items.filter(item => item.sub === currentSubFilter);
+            }
+
+            if (itemsToDisplay.length === 0) {
+                container.innerHTML = `<p style="text-align:center; color: var(--text-muted); padding:2rem;">لا توجد عناصر متاحة حالياً لهذا القسم.</p>`;
+                return;
+            }
+
+            let lastSub = '';
+            const listDiv = document.createElement('div');
+            listDiv.className = 'menu-list';
+
+            itemsToDisplay.forEach(item => {
+                if (item.sub !== lastSub && currentSubFilter === 'all') {
+                    const label = document.createElement('div');
+                    label.className = 'sub-section-label';
+                    label.innerText = item.sub;
+                    listDiv.appendChild(label);
+                    lastSub = item.sub;
+                }
+
+                const waMessage = encodeURIComponent(`مرحباً، أود طلب: ${item.name} (${item.price})`);
+                const card = document.createElement('div');
+                card.className = 'menu-card';
+                card.innerHTML = `
+                    <img src="${item.img}" class="card-img" alt="${item.name}" loading="lazy">
+                    <div class="card-body">
+                        <div class="card-title">${item.name}</div>
+                        <div class="card-desc">${item.desc}</div>
+                        <div class="card-footer">
+                            <div class="card-price">${item.price}</div>
+                            <a href="https://wa.me/9647700000000?text=${waMessage}" target="_blank" class="btn-order">
+                                💬 اطلب الان
+                            </a>
+                        </div>
+                    </div>
+                `;
+                listDiv.appendChild(card);
+            });
+
+            container.appendChild(listDiv);
+        }
+
+        // تشغيل البداية
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSubCategories();
+            renderMenuItems();
+        });
+    </script>
+</body>
+</html>
